@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Table: {{ table_name }}</h2>
+<p><a href="/">Back</a></p>
+<table>
+<thead><tr>{% for c in columns %}<th>{{ c }}</th>{% endfor %}</tr></thead>
+<tbody>
+{% for row in rows %}
+<tr>{% for c in columns %}<td>{{ row[c] }}</td>{% endfor %}</tr>
+{% else %}<tr><td>No rows</td></tr>{% endfor %}
+</tbody>
+</table>
+{% endblock %}
