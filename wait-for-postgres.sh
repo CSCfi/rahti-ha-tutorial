@@ -29,7 +29,7 @@ until nc -z "$host" "$port"; do
   seconds=$((seconds + 1))
   if [ "$seconds" -ge "$maxwait" ]; then
     echo "Timed out"
-    break
+    exit -1
   fi
 done
 
