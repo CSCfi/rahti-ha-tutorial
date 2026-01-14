@@ -14,6 +14,7 @@ host="${1:-$db_host}"
 port="${2:-$db_port}"
 
 maxwait=${3:-15}
+shift 3
 
 if [ -z "$host" ] || [ -z "$port" ]; then
   echo "Error: host and port not provided and could not parse DATABASE_URL"
@@ -32,4 +33,4 @@ until nc -z "$host" "$port"; do
   fi
 done
 
-exec "python" "app.py"
+exec $@
