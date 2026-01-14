@@ -32,4 +32,4 @@ until nc -z "$host" "$port"; do
   fi
 done
 
-exec "python" "pp.py"
+exec "python" "app.py"
