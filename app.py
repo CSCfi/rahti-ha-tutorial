@@ -3,14 +3,23 @@
 """
 import os
 import time
+import logging
 from flask import Flask, render_template, abort, request, Response
 from sqlalchemy import create_engine, MetaData, Table, select
 from sqlalchemy.exc import OperationalError
 from prometheus_client import Counter, Histogram, generate_latest, CONTENT_TYPE_LATEST
 
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s %(levelname)s %(message)s',
+    datefmt='%Y-%m-%dT%H:%M:%S'
+)
+logger = logging.getLogger(__name__)
+
 app = Flask(__name__)
 
 DATABASE_URL = os.environ.get('DATABASE_URL', 'postgresql://postgres:postgres@db:5432/postgres')
+logger.info("Connecting to database: %s", DATABASE_URL)
 engine = create_engine(DATABASE_URL)
 metadata = MetaData()
 
@@ -76,6 +85,8 @@ def after_request(response):
         response.status_code
     ).inc()
 
+    logger.info("%s %s -> %d (%.3fs)", request.method, request.path, response.status_code, latency)
+
     return response
 
 
@@ -88,11 +99,15 @@ def metrics():
 
 
 if __name__ == '__main__':
+    port = int(os.environ.get('PORT', '5000'))
     retry = int(os.environ.get('APP_RETRY', '15'))
     for i in range(retry):
         try:
             with engine.connect():
+                logger.info("Database connection established")
                 break
-        except OperationalError:
+        except OperationalError as err:
+            logger.warning("Database not ready (attempt %d/%d): %s", i + 1, retry, err)
             time.sleep(1)
-    app.run(host='0.0.0.0', port=5000)
+    logger.info("Starting API server on port %d", port)
+    app.run(host='0.0.0.0', port=port)
