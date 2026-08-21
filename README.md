@@ -61,14 +61,20 @@ DATABASE_URL=postgresql://user:pass@localhost:5432/dbname python app.py
 
 A service unit file is provided at `rahti-ha-tutorial.service`.
 
-**1. Edit the unit file** to match your deployment:
+**1. Create a virtualenv and install dependencies:**
+
+```bash
+python3 -m venv /opt/rahti-ha-tutorial/venv
+/opt/rahti-ha-tutorial/venv/bin/pip install -r /opt/rahti-ha-tutorial/requirements.txt
+```
+
+**2. Edit the unit file** to match your deployment:
 
 - `User` / `Group` — the system user that will run the app
 - `WorkingDirectory` — where the app is deployed (e.g. `/opt/rahti-ha-tutorial`)
 - `DATABASE_URL` — your actual PostgreSQL connection string
-- Python path — update `ExecStart` if not using a virtualenv
 
-**2. Install and enable the service:**
+**3. Install and enable the service:**
 
 ```bash
 sudo cp rahti-ha-tutorial.service /etc/systemd/system/
@@ -76,7 +82,7 @@ sudo systemctl daemon-reload
 sudo systemctl enable --now rahti-ha-tutorial
 ```
 
-**3. Check status and logs:**
+**4. Check status and logs:**
 
 ```bash
 sudo systemctl status rahti-ha-tutorial
